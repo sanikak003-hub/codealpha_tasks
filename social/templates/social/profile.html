@@ -1,0 +1,55 @@
+{% extends "social/base.html" %}
+{% block title %}{{ profile_user.username }} | ConnectHub{% endblock %}
+{% block content %}
+<section class="profile-card card">
+    <div class="profile-top">
+        {% if profile.avatar_url %}
+            <img class="profile-avatar" src="{{ profile.avatar_url }}" alt="{{ profile_user.username }} profile photo">
+        {% else %}
+            <div class="profile-avatar placeholder">{{ profile_user.username|first|upper }}</div>
+        {% endif %}
+        <div class="profile-main">
+            <h1>{{ profile_user.get_full_name|default:profile_user.username }}</h1>
+            <p class="muted">@{{ profile_user.username }}</p>
+            {% if profile.bio %}<p class="bio">{{ profile.bio }}</p>{% else %}<p class="muted">No bio added yet.</p>{% endif %}
+            <div class="profile-stats">
+                <span><strong>{{ posts|length }}</strong> posts</span>
+                <span><strong>{{ followers_count }}</strong> followers</span>
+                <span><strong>{{ following_count }}</strong> following</span>
+            </div>
+        </div>
+        <div class="profile-buttons">
+            {% if profile_user == user %}
+                <a class="btn secondary" href="{% url 'edit_profile' %}">Edit profile</a>
+            {% else %}
+                <form method="post" action="{% url 'toggle_follow' profile_user.username %}">
+                    {% csrf_token %}
+                    <button class="btn {% if is_following %}secondary{% else %}primary{% endif %}" type="submit">
+                        {% if is_following %}Unfollow{% else %}Follow{% endif %}
+                    </button>
+                </form>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<div class="profile-posts">
+    <h2>Posts</h2>
+    {% for post in posts %}
+        <article class="post-card card">
+            <div class="muted small">{{ post.created_at|date:"M d, Y, g:i A" }}</div>
+            <p class="post-content">{{ post.content|linebreaksbr }}</p>
+            <div class="post-stats"><span>{{ post.likes.count }} like{{ post.likes.count|pluralize }}</span></div>
+            <form method="post" action="{% url 'toggle_like' post.id %}">
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{% url 'profile' profile_user.username %}">
+                <button class="action-btn {% if post.is_liked %}liked{% endif %}" type="submit">
+                    {% if post.is_liked %}♥ Liked{% else %}♡ Like{% endif %}
+                </button>
+            </form>
+        </article>
+    {% empty %}
+        <div class="empty-state card"><p class="muted">This user hasn't posted anything yet.</p></div>
+    {% endfor %}
+</div>
+{% endblock %}

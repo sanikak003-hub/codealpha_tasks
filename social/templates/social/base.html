@@ -1,0 +1,44 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ConnectHub{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'social/style.css' %}">
+</head>
+<body>
+<header class="topbar">
+    <div class="nav-wrap">
+        <a class="brand" href="{% url 'feed' %}">ConnectHub</a>
+        <nav>
+            {% if user.is_authenticated %}
+                <a href="{% url 'feed' %}">Home</a>
+                <a href="{% url 'profile' user.username %}">My Profile</a>
+                <form class="nav-form" method="post" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <button class="nav-logout" type="submit">Logout</button>
+                </form>
+            {% else %}
+                <a href="{% url 'login' %}">Login</a>
+                <a href="{% url 'register' %}">Register</a>
+            {% endif %}
+        </nav>
+    </div>
+</header>
+
+<main class="page">
+    {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                <div class="message {{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    {% block content %}{% endblock %}
+</main>
+
+<footer class="footer">ConnectHub · Mini Social Media Platform</footer>
+<script src="{% static 'social/app.js' %}"></script>
+</body>
+</html>

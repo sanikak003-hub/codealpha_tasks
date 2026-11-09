@@ -1,0 +1,14 @@
+{% extends "social/base.html" %}
+{% block title %}Login | ConnectHub{% endblock %}
+{% block content %}
+<section class="auth-card">
+    <h1>Welcome back</h1>
+    <p class="muted">Log in to connect with your community.</p>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button class="btn primary full" type="submit">Login</button>
+    </form>
+    <p class="auth-switch">Don't have an account? <a href="{% url 'register' %}">Create one</a></p>
+</section>
+{% endblock %}
